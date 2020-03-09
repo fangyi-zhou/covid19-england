@@ -1,26 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+type State = {
+  ready: boolean;
+  failed: boolean;
+  postcode?: string;
+  lastUpdate?: string;
+  cases?: Map<string, number>;
+};
+
+const DATA_SOURCE = "data_source.json";
+
+class App extends React.Component<{}, State> {
+  state = {
+    ready: false,
+    failed: false
+  };
+
+  async fetchData() {
+    if (this.state.ready) return;
+    const resp = await fetch(DATA_SOURCE);
+    if (resp.ok) {
+      const data = await resp.json();
+      this.setState({ ready: true, ...data });
+    } else {
+      this.setState({ failed: true });
+    }
+  }
+
+  componentDidMount() {
+    this.fetchData().then(() => console.log("Data Loaded"));
+  }
+
+  render() {
+    if (this.state.ready) {
+      return this.render_main();
+    } else if (this.state.failed) {
+      return <div>Error</div>;
+    }
+    return <div>Loading...</div>;
+  }
+
+  render_main() {
+    return <div></div>;
+  }
 }
 
 export default App;
