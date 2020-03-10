@@ -1,0 +1,26 @@
+version: 2.1
+orbs:
+  node: circleci/node@1.1.6
+jobs:
+  build:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "d7:04:a2:2e:53:da:b4:f7:22:fe:66:57:a1:f1:ef:c9"
+      - node/with-cache:
+          steps:
+            - run: yarn install
+            - deploy:
+                command: |
+                  if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                    yarn deploy
+                  fi
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
