@@ -53,8 +53,9 @@ class App extends React.Component<{}, State> {
   async findData() {
     const lookupPost = await postcodes.lookup(this.state.postcode);
     const resultPost = lookupPost?.result;
-    const lookupResult = (resultPost)?
-      lookupPost : await postcodes.outcodes(this.state.postcode);
+    const lookupResult = resultPost
+      ? lookupPost
+      : await postcodes.outcodes(this.state.postcode);
     const result = lookupResult?.result;
     if (!result) {
       this.setState({ found: false });
@@ -66,8 +67,8 @@ class App extends React.Component<{}, State> {
         let count = 0;
         let has = false;
         let v = "";
-        if (vv instanceof Array){
-          vv.forEach((vi) => {
+        if (vv instanceof Array) {
+          vv.forEach(vi => {
             has = has || this.state.cases.has(vi);
             const ci = this.state.cases.get(vi);
             if (ci) {
