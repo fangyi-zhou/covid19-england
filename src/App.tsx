@@ -56,7 +56,6 @@ class App extends React.Component<{}, State> {
     const lookupResult = (resultPost)?
       lookupPost : await postcodes.outcodes(this.state.postcode);
     const result = lookupResult?.result;
-    console.log(result);
     if (!result) {
       this.setState({ found: false });
       return;
