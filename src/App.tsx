@@ -16,7 +16,7 @@ type State = {
 };
 
 const CANDIDATE_KEYS = ["primary_care_trust", "admin_district"];
-const DATA_SOURCE = "data_source.json";
+const DATA_SOURCE = process.env.PUBLIC_URL + "/data_source.json";
 const GOV_UK_DATA_SOURCE =
   "https://www.gov.uk/government/publications/coronavirus-covid-19-number-of-cases-in-england/coronavirus-covid-19-number-of-cases-in-england";
 
