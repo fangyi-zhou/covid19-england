@@ -16,6 +16,8 @@ jobs:
             - deploy:
                 command: |
                   if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                    git config --global user.email "me+bot@fangyi.io";
+                    git config --global user.name "Fangyi Zhou (bot)";
                     yarn deploy
                   fi
 
