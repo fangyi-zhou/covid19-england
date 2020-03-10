@@ -7,9 +7,6 @@ jobs:
       name: node/default
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "66:f9:7f:06:4e:9c:42:a2:73:1c:84:40:be:f0:71:e4"
       - node/with-cache:
           steps:
             - run: yarn install
