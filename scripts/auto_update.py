@@ -15,6 +15,8 @@ async def main():
         with open(get_data.OUT_FILE) as f:
             new = f.read()
         if new != old:
+            print("Pushing new data")
+            os.system("git pull")
             os.system(f"git add {get_data.OUT_FILE}")
             os.system('git commit -m "Update COVID-19 Data"')
             os.system("git push")
