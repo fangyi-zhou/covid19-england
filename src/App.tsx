@@ -1,6 +1,5 @@
 import React from "react";
 import "./App.css";
-import { geolocated, GeolocatedProps } from "react-geolocated";
 
 const postcodes = require("node-postcodes.io");
 
@@ -12,18 +11,23 @@ type State = {
   cases: Map<string, string>;
   myArea?: string;
   myCaseNo?: string;
+  postcodeInput: string;
+  found?: boolean;
 };
 
 const CANDIDATE_KEYS = ["primary_care_trust", "admin_district"];
 const DATA_SOURCE = "data_source.json";
+const GOV_UK_DATA_SOURCE =
+  "https://www.gov.uk/government/publications/coronavirus-covid-19-number-of-cases-in-england/coronavirus-covid-19-number-of-cases-in-england";
 
-class App extends React.Component<GeolocatedProps, State> {
-  constructor(props: GeolocatedProps) {
+class App extends React.Component<{}, State> {
+  constructor(props: {}) {
     super(props);
     this.state = {
       ready: false,
       failed: false,
-      cases: new Map()
+      cases: new Map(),
+      postcodeInput: ""
     };
   }
 
@@ -46,51 +50,85 @@ class App extends React.Component<GeolocatedProps, State> {
     this.fetchDataSource().then(() => console.log("Data Loaded"));
   }
 
-  render() {
-    if (this.state.ready) {
-      if (this.props.coords) {
-        this.findCasesByLatLong().then(() =>
-          console.log("Loaded Case Numbers")
-        );
-      }
-      return this.render_main();
-    } else if (this.state.failed) {
-      return <div>Error</div>;
+  async findData() {
+    const lookupResult = await postcodes.lookup(this.state.postcode);
+    const result = lookupResult?.result;
+    // console.log(result);
+    if (!result) {
+      this.setState({ found: false });
+      return;
     }
-    return <div>Loading...</div>;
-  }
-
-  async findCasesByLatLong() {
-    const lat = this.props.coords?.latitude;
-    const long = this.props.coords?.longitude;
-    const postcodeResults = await postcodes.geo(lat, long);
-    for (let result in postcodeResults.result) {
-      for (let k in CANDIDATE_KEYS) {
+    for (let k of CANDIDATE_KEYS) {
+      if (k in result) {
         const v = result[k];
-        if (v in this.state.cases) {
+        if (this.state.cases.has(v)) {
           const numCases = this.state.cases.get(v);
-          this.setState({ myArea: v, myCaseNo: numCases });
+          this.setState({ myArea: v, myCaseNo: numCases, found: true });
         }
       }
     }
   }
 
+  render() {
+    if (this.state.ready) {
+      if (this.state.postcode) {
+        if (this.state.found === undefined) {
+          this.findData().then(() => console.log("Data Found"));
+        } else if (this.state.found === false) {
+          return (
+            <div>
+              <div>{`Failed to find information about postcode ${this.state.postcode}`}</div>
+              <form onSubmit={this.handleReset.bind(this)}>
+                <input type="submit" value="Reset" />
+              </form>
+            </div>
+          );
+        }
+      }
+      return this.render_main();
+    } else if (this.state.failed) {
+      return <div>Error loading data</div>;
+    }
+    return <div>Loading...</div>;
+  }
+
+  handlePostcode(event: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({ postcodeInput: event.target.value });
+  }
+
+  handleSubmit() {
+    this.setState({ postcode: this.state.postcodeInput });
+  }
+
+  handleReset() {
+    this.setState({ postcode: undefined, found: undefined });
+  }
+
   render_main() {
-    return !this.props.isGeolocationAvailable ? (
-      <div>Your browser does not support Geolocation</div>
-    ) : !this.props.isGeolocationEnabled ? (
-      <div>Geolocation is not enabled</div>
-    ) : this.props.coords && this.state.myArea && this.state.myCaseNo ? (
-      <div>{`You're at ${this.state.myArea}. There are ${this.state.myCaseNo} in your area.`}</div>
+    return this.state.postcode && this.state.myArea && this.state.myCaseNo ? (
+      <div>
+        <div>{`You're at ${this.state.myArea}. There are ${this.state.myCaseNo} COVID-19 case(s) in your area.`}</div>
+        <form onSubmit={this.handleReset.bind(this)}>
+          <input type="submit" value="Reset" />
+        </form>
+        <div>
+          {`Last Updated: ${this.state.lastUpdate} `}
+          <a href={GOV_UK_DATA_SOURCE}>Source</a>
+        </div>
+      </div>
+    ) : this.state.postcode ? (
+      <div>Loading...</div>
     ) : (
-      <div>Getting the location data&hellip; </div>
+      <form onSubmit={this.handleSubmit.bind(this)}>
+        <input
+          type="text"
+          value={this.state.postcodeInput}
+          onChange={this.handlePostcode.bind(this)}
+        />
+        <input type="submit" value="Find" />
+      </form>
     );
   }
 }
 
-export default geolocated({
-  positionOptions: {
-    enableHighAccuracy: false
-  },
-  userDecisionTimeout: 5000
-})(App);
+export default App;
