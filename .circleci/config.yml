@@ -9,7 +9,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "d7:04:a2:2e:53:da:b4:f7:22:fe:66:57:a1:f1:ef:c9"
+            - "66:f9:7f:06:4e:9c:42:a2:73:1c:84:40:be:f0:71:e4"
       - node/with-cache:
           steps:
             - run: yarn install
