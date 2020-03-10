@@ -51,18 +51,38 @@ class App extends React.Component<{}, State> {
   }
 
   async findData() {
-    const lookupResult = await postcodes.lookup(this.state.postcode);
+    const lookupPost = await postcodes.lookup(this.state.postcode);
+    const resultPost = lookupPost?.result;
+    const lookupResult = (resultPost)?
+      lookupPost : await postcodes.outcodes(this.state.postcode);
     const result = lookupResult?.result;
-    // console.log(result);
+    console.log(result);
     if (!result) {
       this.setState({ found: false });
       return;
     }
     for (let k of CANDIDATE_KEYS) {
       if (k in result) {
-        const v = result[k];
-        if (this.state.cases.has(v)) {
-          const numCases = this.state.cases.get(v);
+        const vv = result[k];
+        let count = 0;
+        let has = false;
+        let v = "";
+        if (vv instanceof Array){
+          vv.forEach((vi) => {
+            has = has || this.state.cases.has(vi);
+            const ci = this.state.cases.get(vi);
+            if (ci) {
+              count = count + Number(this.state.cases.get(vi));
+            }
+            v = v + ", " + vi;
+          });
+        } else {
+          has = this.state.cases.has(vv);
+          count = Number(this.state.cases.get(vv));
+          v = vv;
+        }
+        if (has) {
+          const numCases = String(count);
           this.setState({ myArea: v, myCaseNo: numCases, found: true });
         }
       }
