@@ -48,7 +48,7 @@ class Main extends React.Component<Prop, State> {
             if (ci) {
               count = count + Number(this.props.cases.get(vi));
             }
-            v = v + ", " + vi;
+            v = v !== "" ? v + ", " + vi : vi;
           });
         } else {
           has = this.props.cases.has(vv);
@@ -96,7 +96,7 @@ class Main extends React.Component<Prop, State> {
   render_main() {
     return this.state.postcode && this.state.myArea && this.state.myCaseNo ? (
       <div>
-        <div>{`You're at ${this.state.myArea}. There are ${this.state.myCaseNo} COVID-19 case(s) in your area.`}</div>
+        <div>{`${this.state.postcode} is in ${this.state.myArea}. There are ${this.state.myCaseNo} COVID-19 case(s) in your area.`}</div>
         <form onSubmit={this.handleReset.bind(this)}>
           <input type="submit" value="Reset" />
         </form>
