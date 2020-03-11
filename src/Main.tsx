@@ -124,14 +124,17 @@ class Main extends React.Component<Prop, State> {
         <div style={div_style}>
           <form onSubmit={this.handleSubmit.bind(this)}>
             <h1>Enter your Postcode:</h1>
-            <TextField
-              id="postcode"
-              label="postcode"
-              variant="outlined"
-              onChange={this.handlePostcode.bind(this)}
-            >
-              {this.state.postcodeInput}
-            </TextField>
+            <div>
+              <TextField
+                id="postcode"
+                label="postcode"
+                variant="outlined"
+                onChange={this.handlePostcode.bind(this)}
+              >
+                {this.state.postcodeInput}
+              </TextField>
+            </div>
+            <br />
             <Button
               variant="outlined"
               color="primary"
