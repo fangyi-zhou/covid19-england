@@ -1,4 +1,6 @@
 import React from "react";
+import { Container, TextField, Button } from "@material-ui/core";
+import * as CSS from "csstype";
 
 const postcodes = require("node-postcodes.io");
 
@@ -18,6 +20,7 @@ type State = {
 const CANDIDATE_KEYS = ["primary_care_trust", "admin_district"];
 const GOV_UK_DATA_SOURCE =
   "https://www.gov.uk/government/publications/coronavirus-covid-19-number-of-cases-in-england/coronavirus-covid-19-number-of-cases-in-england";
+
 class Main extends React.Component<Prop, State> {
   constructor(prop: Prop) {
     super(prop);
@@ -94,28 +97,49 @@ class Main extends React.Component<Prop, State> {
   }
 
   render_main() {
+    const div_style: CSS.Properties = {
+      textAlign: "center",
+      margin: "1em"
+    };
+
     return this.state.postcode && this.state.myArea && this.state.myCaseNo ? (
-      <div>
+      <div style={div_style}>
         <div>{`${this.state.postcode} is in ${this.state.myArea}. There are ${this.state.myCaseNo} COVID-19 case(s) in your area.`}</div>
-        <form onSubmit={this.handleReset.bind(this)}>
-          <input type="submit" value="Reset" />
-        </form>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={this.handleReset.bind(this)}
+        >
+          Reset
+        </Button>
         <div>
           {`Last Updated: ${this.props.lastUpdate} `}
           <a href={GOV_UK_DATA_SOURCE}>Source</a>
         </div>
       </div>
     ) : this.state.postcode ? (
-      <div>Loading...</div>
+      <div style={div_style}>Loading...</div>
     ) : (
-      <form onSubmit={this.handleSubmit.bind(this)}>
-        <input
-          type="text"
-          value={this.state.postcodeInput}
-          onChange={this.handlePostcode.bind(this)}
-        />
-        <input type="submit" value="Find" />
-      </form>
+      <Container>
+        <div style={div_style}>
+          <h1>Enter your Postcode:</h1>
+          <TextField
+            id="postcode"
+            label="postcode"
+            variant="outlined"
+            onChange={this.handlePostcode.bind(this)}
+          >
+            {this.state.postcodeInput}
+          </TextField>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={this.handleSubmit.bind(this)}
+          >
+            Find
+          </Button>
+        </div>
+      </Container>
     );
   }
 }
